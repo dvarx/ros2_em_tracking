@@ -31,9 +31,6 @@ rosidl_generate_interfaces(${PROJECT_NAME} ${msg_files} ${srv_files}
     DEPENDENCIES std_msgs
 )
 
-#allows to use services from within the same package
-# rosidl_target_interfaces(mdriver_node
-#   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} rosidl_typesupport_cpp)
 target_link_libraries(mdriver_node "${cpp_typesupport_target}")
 
@@ -41,28 +38,8 @@ install(TARGETS
   mdriver_node
   DESTINATION lib/${PROJECT_NAME})
 
-# ament_python_install_package(${PROJECT_NAME})
-
 ament_export_dependencies(rosidl_default_runtime)
 
-
-
 ament_package()
-
-#
-
-
-# catkin_install_python(PROGRAMS 
-#     scripts/calibration_tnbmns.py
-#     scripts/current_control.py
-#     scripts/calibration_centerpoint_tnbmns.py
-#     scripts/driver_test.py
-#     scripts/field_control.py
-#     scripts/field_explorer.py
-#     scripts/saturation_tests.py
-#     scripts/resonance_tester.py
-#     scripts/tnb_mns_calculator_node.py
-#     scripts/tnb_emns_python_control.py
-#     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 file(GLOB python_scripts scripts/*.py)

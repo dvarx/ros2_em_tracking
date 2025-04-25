@@ -114,15 +114,12 @@ void mySigintHandler(int sig)
   // Do some custom action.
   // For example, publish a stop message to some other nodes.
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Shutdown using SIGINT");
-  //ROS_INFO("Shutdown using SIGINT");
 
   close(sock_cli);
 
-  //ros::Duration(0.5).sleep();
   rclcpp::sleep_for(std::chrono::milliseconds(500));
 
   // All the default sigint handler does is call shutdown()
-  //ros::shutdown();
   rclcpp::shutdown();
 }
 
@@ -207,16 +204,10 @@ bool init_comm(void){
     setsockopt(sock_cli, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 
     //try to establish a tcp connection to the ccard
-    //ROS_INFO("Establishing TCP connection");
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Establishing TCP connection");
     if(connect_with_timeout(sock_cli, (struct sockaddr *)&servaddr, sizeof(servaddr),5000)<0){
         return false;
     }
-    /*
-    if (connect(sock_cli, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
-        return false;
-    ROS_INFO("TCP connection established");
-    */
 
     return true;
 }
@@ -229,14 +220,6 @@ void srv_run_regular_cb(const std::shared_ptr<mdriver::srv::RunRegular::Request>
     response->success=true;
 }
 
-// bool srv_run_regular_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
-//     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
-//     for(int i=0; i<NO_CHANNELS; i++)
-//         m_run_reg_flags[i]=req.enable[i];
-//     res.success=true;
-//     return true;
-// }
-
 void srv_run_resonant_cb(const std::shared_ptr<mdriver::srv::RunResonant::Request> req, 
     std::shared_ptr<mdriver::srv::RunResonant::Response> res){
     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
@@ -245,14 +228,6 @@ void srv_run_resonant_cb(const std::shared_ptr<mdriver::srv::RunResonant::Reques
     res->success=true;
 }
 
-// bool srv_run_resonant_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
-//     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
-//     for(int i=0; i<NO_CHANNELS; i++)
-//         m_run_res_flags[i]=req.enable[i];
-//     res.success=true;
-//     return true;
-// }
-
 void srv_enable_mdriver_cb(const std::shared_ptr<mdriver::srv::Enable::Request> req, 
     std::shared_ptr<mdriver::srv::Enable::Response> resp){
     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
@@ -260,14 +235,6 @@ void srv_enable_mdriver_cb(const std::shared_ptr<mdriver::srv::Enable::Request> 
         m_buck_flags[i]=req->enable[i];
     resp->success=true;
 }
-
-// bool srv_enable_mdriver_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
-//     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
-//     for(int i=0; i<NO_CHANNELS; i++)
-//         m_buck_flags[i]=req.enable[i];
-//     res.success=true;
-//     return true;
-// }
 
 void srv_stop_mdriver_cb(const std::shared_ptr<mdriver::srv::Stop::Request> req,
     std::shared_ptr<mdriver::srv::Stop::Response> res){
@@ -278,29 +245,16 @@ void srv_stop_mdriver_cb(const std::shared_ptr<mdriver::srv::Stop::Request> req,
     res->success=true;
 }
 
-// bool srv_stop_mdriver_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
-//     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
-//     for(int i=0; i<NO_CHANNELS; i++)
-//         m_stop_flags[i]=req.enable[i];
-//     res.success=true;
-//     reset_currents();
-//     return true;
-// }
-
 void msg_des_currents_reg_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
-    //ROS_DEBUG("Received New Regular Currents");
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received New Regular Currents");
     for(int i=0; i<NO_CHANNELS; i++){
-        //ROS_DEBUG("Received desired current: %f",msg->data[i]);
         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received desired current: %f",msg->data[i]);
         if(msg->data[i]>max_current){
             m_des_currents_mA[i]=max_current;
-            //ROS_DEBUG("current limited to maximum current");
             RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"current limited to maximum current");
         }
         else if(msg->data[i]<-max_current){
             m_des_currents_mA[i]=-max_current;
-            //ROS_DEBUG("current limited to maximum current");
             RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"current limited to maximum current");
         }
         else
@@ -308,25 +262,7 @@ void msg_des_currents_reg_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
     }
 }
 
-// void msg_des_currents_reg_cb(const std_msgs::Float32MultiArray& msg){
-//     ROS_DEBUG("Received New Regular Currents");
-//     for(int i=0; i<NO_CHANNELS; i++){
-//         ROS_DEBUG("Received desired current: %f",msg.data[i]);
-//         if(msg.data[i]>max_current){
-//             m_des_currents_mA[i]=max_current;
-//             ROS_DEBUG("current limited to maximum current");
-//         }
-//         else if(msg.data[i]<-max_current){
-//             m_des_currents_mA[i]=-max_current;
-//             ROS_DEBUG("current limited to maximum current");
-//         }
-//         else
-//             m_des_currents_mA[i]=msg.data[i];
-//     }
-// }
-
 void msg_des_duties_reg_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
-    //ROS_DEBUG("Received New Duties");
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received New Duties");
     for(int i=0; i<NO_CHANNELS; i++){
         if(msg->data[i]>0.9)
@@ -338,23 +274,9 @@ void msg_des_duties_reg_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
     }
 }
 
-// void msg_des_duties_reg_cb(const std_msgs::Float32MultiArray & msg){
-//     ROS_DEBUG("Received New Duties");
-//     for(int i=0; i<NO_CHANNELS; i++){
-//         if(msg.data[i]>0.9)
-//             m_des_duties[i]=0.9;
-//         else if(msg.data[i]<0.0)
-//             m_des_duties[i]=0.0;
-//         else
-//             m_des_duties[i]=msg.data[i];
-//     }
-// }
-
 void msg_des_currents_res_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
-    //ROS_DEBUG("Received New Resonant Currents");
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received New Resonant Currents");
     for(int i=0; i<NO_CHANNELS; i++){
-        //ROS_DEBUG("Received: %f",msg.data[i]);
         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received: %f",msg->data[i]);
         if(msg->data[i]>max_current_res)
             m_des_currents_res_mA[i]=max_current_res;
@@ -365,37 +287,15 @@ void msg_des_currents_res_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
     }
 }
 
-// void msg_des_currents_res_cb(const std_msgs::Float32MultiArray& msg){
-//     ROS_DEBUG("Received New Resonant Currents");
-//     for(int i=0; i<NO_CHANNELS; i++){
-//         ROS_DEBUG("Received: %f",msg.data[i]);
-//         if(msg.data[i]>max_current_res)
-//             m_des_currents_res_mA[i]=max_current_res;
-//         else if(msg.data[i]<-max_current_res)
-//             m_des_currents_res_mA[i]=-max_current_res;
-//         else
-//             m_des_currents_res_mA[i]=msg.data[i];
-//     }
-// }
-
 void msg_des_freqs_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
-    //ROS_DEBUG("Received New Res Frequencies");
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received New Res Frequencies");
     for(int i=0; i<NO_CHANNELS; i++){
         m_des_freqs_mhz[i]=msg->data[i];
     }
 }
 
-// void msg_des_freqs_cb(const std_msgs::Float32MultiArray& msg){
-//     ROS_DEBUG("Received New Res Frequencies");
-//     for(int i=0; i<NO_CHANNELS; i++){
-//         m_des_freqs_mhz[i]=msg.data[i];
-//     }
-// }
-
 unsigned int send_counter=0;
 void mdriver_timer_cb(){
-    //ROS_DEBUG("Entering Timer Handler...");
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Entering Timer Handler...");
     //apply the first order time constant [pre-filter]
     for(int i=0; i<NO_CHANNELS; i++){
@@ -436,15 +336,12 @@ void mdriver_timer_cb(){
         }
     }
     //send the ethernet package
-    //ROS_DEBUG("Sending Ethernet Package");
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Sending Ethernet Package");
     for(int i=0; i<NO_CHANNELS; i++)
         RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Sending des_currents[%d]=%f",i,m_des_currents_mA_filtered[i]);
-        //ROS_DEBUG("Sending des_currents[%d]=%f",i,m_des_currents_mA_filtered[i]);
     if(hardware_connected){
         memcpy(send_buffer,&m_next_message,sizeof(m_next_message));
         if(send(sock_cli,send_buffer,sizeof(m_next_message),0)<0){
-            //ROS_ERROR("Could not send message via TCP, aborting");
             RCLCPP_ERROR(rclcpp::get_logger("rclcpp"),"Could not send message via TCP, aborting");
             reset_currents();
             close(sock_cli);
@@ -493,22 +390,18 @@ void mdriver_timer_cb(){
     send_counter++;
     if(send_counter%packets_per_second==0)
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Sent another %d packets...",packets_per_second);
-        //ROS_INFO("Sent another %d packets...",packets_per_second);
     return;
 }
 
 //main
 int main(int argc,char** argv){
-    //ros::init(argc, argv, "mdriver_node",ros::init_options::NoSigintHandler);
     rclcpp::init(argc,argv);
 
-    //ROS_INFO("startup");
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"startup");
     
 
     signal(SIGINT, mySigintHandler);
 
-    //ros::NodeHandle nh("~");
     auto nh=std::make_shared<rclcpp::Node>("mdriver_node");
 
     //init ttycomm
@@ -517,23 +410,16 @@ int main(int argc,char** argv){
         if(!comm_est_succeeded){
             if(errno==ETIMEDOUT)
                 RCLCPP_ERROR(rclcpp::get_logger("rclcpp"),"Could not establish TCP connection to ControlCard: Timeout");
-                //ROS_ERROR("Could not establish TCP connection to ControlCard: Timeout");
             else
                 RCLCPP_ERROR(rclcpp::get_logger("rclcpp"),"Could not establish TCP connection to ControlCard: %s",strerror(errno));
-                //ROS_ERROR("Could not establish TCP connection to ControlCard: %s",strerror(errno));
             rclcpp::shutdown();
             return EXIT_FAILURE;
         }
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Established Connection");
-        //ROS_INFO("Established Connection");
     }
-
-    // TODO : create a magnetic field model
 
     //main timer shows callback function send the driver messages
     rclcpp::TimerBase::SharedPtr timer = nh->create_wall_timer(std::chrono::milliseconds(long(1e3*send_interval)), mdriver_timer_cb);
-    //ros::Timer timer = nhcreateTimer(ros::Duration(send_interval), mdriver_timer_cb);
-    //ROS_INFO("Sending data packets at an interval of %f ms",send_interval*1e3);
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Sending data packets at an interval of %f ms",send_interval*1e3);
 
     //initialize some fields in tnb_mns_structure
@@ -544,29 +430,19 @@ int main(int argc,char** argv){
 
     //publisher node for TNB_MNS_STATUS
     tnb_mns_state_publisher=nh->create_publisher<mdriver::msg::Status>("/mdriver/system_state", 1);
-    //tnb_mns_state_publisher = nh.advertise<mdriver::Status>("/mdriver/system_state", 1);
 
     //register services
     srv_enable_mdriver=nh->create_service<mdriver::srv::Enable>("/mdriver/enable",&srv_enable_mdriver_cb);
     srv_stop_mdriver=nh->create_service<mdriver::srv::Stop>("/mdriver/stop",&srv_stop_mdriver_cb);
     srv_run_regular=nh->create_service<mdriver::srv::RunRegular>("/mdriver/run_regular",&srv_run_regular_cb);
     srv_run_resonant=nh->create_service<mdriver::srv::RunResonant>("/mdriver/run_resonant",&srv_run_resonant_cb);
-    // //srv_enable_mdriver=nh.advertiseService("/mdriver/enable",srv_enable_mdriver_cb);
-    // //srv_stop_mdriver=nh.advertiseService("/mdriver/stop",srv_stop_mdriver_cb);
-    // //srv_run_regular=nh.advertiseService("/mdriver/run_regular",srv_run_regular_cb);
-    // //srv_run_resonant=nh.advertiseService("/mdriver/run_resonant",srv_run_resonant_cb);
 
     // //register subscribers
     des_currents_reg_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_currents_reg",64,msg_des_currents_reg_cb);
     des_duties_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_duties",64,msg_des_duties_reg_cb);
     des_currents_res_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_currents_res",64,msg_des_currents_res_cb);
     des_freqs_res=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_freqs_res",64,msg_des_freqs_cb);
-    // des_currents_reg_subs=nh.subscribe("/mdriver/des_currents_reg",64,msg_des_currents_reg_cb);
-    // des_duties_subs=nh.subscribe("/mdriver/des_duties",64,msg_des_duties_reg_cb);
-    // des_currents_res_subs=nh.subscribe("/mdriver/des_currents_res",64,msg_des_currents_res_cb);
-    // des_freqs_res=nh.subscribe("/mdriver/des_freqs_res",64,msg_des_freqs_cb);
 
-    //ROS_INFO("Start spinning");
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Start spinning");
     
 
