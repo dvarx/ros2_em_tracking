@@ -33,9 +33,11 @@ rosidl_generate_interfaces(${PROJECT_NAME} ${msg_files} ${srv_files}
 
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} rosidl_typesupport_cpp)
 target_link_libraries(mdriver_node "${cpp_typesupport_target}")
+target_link_libraries(mdriver_node_test "${cpp_typesupport_target}")
 
 install(TARGETS
   mdriver_node
+  mdriver_node_test
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(rosidl_default_runtime)
