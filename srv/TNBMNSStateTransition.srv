@@ -1,0 +1,3 @@
+bool[6] enable   #indicates whether the state transition should be triggered for channel n
+---
+bool success
