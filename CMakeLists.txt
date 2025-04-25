@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(tnb_mns_driver)
+project(mdriver)
 
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
@@ -12,7 +12,7 @@ find_package(rosidl_default_generators REQUIRED)
 include_directories(include)
 
 set(msg_files
-  "msg/TnbMnsStatus.msg"
+  "msg/Status.msg"
 )
 
 set(srv_files
@@ -20,23 +20,25 @@ set(srv_files
   "srv/RunRegular.srv"
   "srv/RunResonant.srv"
   "srv/Stop.srv"
-  "srv/TNBMNSStateTransition.srv")
+  "srv/StateTransition.srv")
 
-add_executable(tnb_mns_driver_node src/tnb_mns_driver_node.cpp)
-ament_target_dependencies(tnb_mns_driver_node rclcpp std_msgs)
+add_executable(mdriver_node src/mdriver_node.cpp)
+add_executable(mdriver_node_test src/mdriver_node_test.cpp)
+ament_target_dependencies(mdriver_node rclcpp std_msgs)
+ament_target_dependencies(mdriver_node_test rclcpp std_msgs)
 
 rosidl_generate_interfaces(${PROJECT_NAME} ${msg_files} ${srv_files}
     DEPENDENCIES std_msgs
 )
 
 #allows to use services from within the same package
-# rosidl_target_interfaces(tnb_mns_driver_node
+# rosidl_target_interfaces(mdriver_node
 #   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} rosidl_typesupport_cpp)
-target_link_libraries(tnb_mns_driver_node "${cpp_typesupport_target}")
+target_link_libraries(mdriver_node "${cpp_typesupport_target}")
 
 install(TARGETS
-  tnb_mns_driver_node
+  mdriver_node
   DESTINATION lib/${PROJECT_NAME})
 
 # ament_python_install_package(${PROJECT_NAME})

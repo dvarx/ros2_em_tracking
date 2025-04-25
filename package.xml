@@ -20,7 +20,7 @@
     limitations under the License.
 -->
 <package format="3">
-  <name>tnb_mns_driver</name>
+  <name>mdriver</name>
   <version>1.0.0</version>
   <description>TNB MNS Driver</description>
 
@@ -49,6 +49,6 @@
 
   <export>
     <build_type>ament_cmake</build_type>
-    <rosidl_interface_packages>tnb_mns_driver</rosidl_interface_packages>
+    <rosidl_interface_packages>mdriver</rosidl_interface_packages>
   </export>
 </package>

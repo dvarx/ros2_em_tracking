@@ -3,13 +3,13 @@
 #include <rclcpp/logging.hpp>
 #include <std_msgs/msg/float32_multi_array.hpp>
 #include <std_msgs/msg/u_int32_multi_array.hpp>
-#include "tnb_mns_driver/msg/tnb_mns_status.hpp"
-#include "tnb_mns_driver/srv/enable.hpp"
-#include "tnb_mns_driver/srv/run_regular.hpp"
-#include "tnb_mns_driver/srv/run_resonant.hpp"
-#include "tnb_mns_driver/srv/stop.hpp"
-#include "tnb_mns_driver/srv/tnbmns_state_transition.hpp"
-//#include "tnb_mns_driver/TNBMNSStateTransition.h"
+#include "mdriver/msg/status.hpp"
+#include "mdriver/srv/enable.hpp"
+#include "mdriver/srv/run_regular.hpp"
+#include "mdriver/srv/run_resonant.hpp"
+#include "mdriver/srv/stop.hpp"
+#include "mdriver/srv/state_transition.hpp"
+//#include "mdriver/TNBMNSStateTransition.h"
 #include "statemachine.h"
 
 //ethernet / ip related includes
@@ -35,7 +35,7 @@
 //this defines the downsampling for the TNB_MNS_STATUS topics
 #define TNB_MNS_STATUS_DOWNSAMPLE 10
 
-rclcpp::Publisher<tnb_mns_driver::msg::TnbMnsStatus>::SharedPtr tnb_mns_state_publisher;
+rclcpp::Publisher<mdriver::msg::Status>::SharedPtr tnb_mns_state_publisher;
 bool hardware_connected=true;
 
 
@@ -78,11 +78,11 @@ rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr des_freqs_res;
 rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr des_duties_subs;
 
 //service handles
-//ros::ServiceServer srv_enable_tnb_mns_driver;
-rclcpp::Service<tnb_mns_driver::srv::Enable>::SharedPtr srv_enable_tnb_mns_driver;
-rclcpp::Service<tnb_mns_driver::srv::RunRegular>::SharedPtr srv_run_regular;
-rclcpp::Service<tnb_mns_driver::srv::RunResonant>::SharedPtr srv_run_resonant;
-rclcpp::Service<tnb_mns_driver::srv::Stop>::SharedPtr srv_stop_tnb_mns_driver;
+//ros::ServiceServer srv_enable_mdriver;
+rclcpp::Service<mdriver::srv::Enable>::SharedPtr srv_enable_mdriver;
+rclcpp::Service<mdriver::srv::RunRegular>::SharedPtr srv_run_regular;
+rclcpp::Service<mdriver::srv::RunResonant>::SharedPtr srv_run_resonant;
+rclcpp::Service<mdriver::srv::Stop>::SharedPtr srv_stop_mdriver;
 
 //state variables
 bool enable_input_lowpass=true;
@@ -221,15 +221,15 @@ bool init_comm(void){
     return true;
 }
 
-void srv_run_regular_cb(const std::shared_ptr<tnb_mns_driver::srv::RunRegular::Request> req, 
-    std::shared_ptr<tnb_mns_driver::srv::RunRegular::Response> response){
+void srv_run_regular_cb(const std::shared_ptr<mdriver::srv::RunRegular::Request> req, 
+    std::shared_ptr<mdriver::srv::RunRegular::Response> response){
     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
     for(int i=0; i<NO_CHANNELS; i++)
         m_run_reg_flags[i]=req->enable[i];
     response->success=true;
 }
 
-// bool srv_run_regular_cb(tnb_mns_driver::TNBMNSStateTransition::Request& req,tnb_mns_driver::TNBMNSStateTransition::Response& res){
+// bool srv_run_regular_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
 //     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
 //     for(int i=0; i<NO_CHANNELS; i++)
 //         m_run_reg_flags[i]=req.enable[i];
@@ -237,15 +237,15 @@ void srv_run_regular_cb(const std::shared_ptr<tnb_mns_driver::srv::RunRegular::R
 //     return true;
 // }
 
-void srv_run_resonant_cb(const std::shared_ptr<tnb_mns_driver::srv::RunResonant::Request> req, 
-    std::shared_ptr<tnb_mns_driver::srv::RunResonant::Response> res){
+void srv_run_resonant_cb(const std::shared_ptr<mdriver::srv::RunResonant::Request> req, 
+    std::shared_ptr<mdriver::srv::RunResonant::Response> res){
     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
     for(int i=0; i<NO_CHANNELS; i++)
         m_run_res_flags[i]=req->enable[i];
     res->success=true;
 }
 
-// bool srv_run_resonant_cb(tnb_mns_driver::TNBMNSStateTransition::Request& req,tnb_mns_driver::TNBMNSStateTransition::Response& res){
+// bool srv_run_resonant_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
 //     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
 //     for(int i=0; i<NO_CHANNELS; i++)
 //         m_run_res_flags[i]=req.enable[i];
@@ -253,15 +253,15 @@ void srv_run_resonant_cb(const std::shared_ptr<tnb_mns_driver::srv::RunResonant:
 //     return true;
 // }
 
-void srv_enable_tnb_mns_driver_cb(const std::shared_ptr<tnb_mns_driver::srv::Enable::Request> req, 
-    std::shared_ptr<tnb_mns_driver::srv::Enable::Response> resp){
+void srv_enable_mdriver_cb(const std::shared_ptr<mdriver::srv::Enable::Request> req, 
+    std::shared_ptr<mdriver::srv::Enable::Response> resp){
     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
     for(int i=0; i<NO_CHANNELS; i++)
         m_buck_flags[i]=req->enable[i];
     resp->success=true;
 }
 
-// bool srv_enable_tnb_mns_driver_cb(tnb_mns_driver::TNBMNSStateTransition::Request& req,tnb_mns_driver::TNBMNSStateTransition::Response& res){
+// bool srv_enable_mdriver_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
 //     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
 //     for(int i=0; i<NO_CHANNELS; i++)
 //         m_buck_flags[i]=req.enable[i];
@@ -269,8 +269,8 @@ void srv_enable_tnb_mns_driver_cb(const std::shared_ptr<tnb_mns_driver::srv::Ena
 //     return true;
 // }
 
-void srv_stop_tnb_mns_driver_cb(const std::shared_ptr<tnb_mns_driver::srv::Stop::Request> req,
-    std::shared_ptr<tnb_mns_driver::srv::Stop::Response> res){
+void srv_stop_mdriver_cb(const std::shared_ptr<mdriver::srv::Stop::Request> req,
+    std::shared_ptr<mdriver::srv::Stop::Response> res){
     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
     for(int i=0; i<NO_CHANNELS; i++)
         m_stop_flags[i]=req->enable[i];
@@ -278,7 +278,7 @@ void srv_stop_tnb_mns_driver_cb(const std::shared_ptr<tnb_mns_driver::srv::Stop:
     res->success=true;
 }
 
-// bool srv_stop_tnb_mns_driver_cb(tnb_mns_driver::TNBMNSStateTransition::Request& req,tnb_mns_driver::TNBMNSStateTransition::Response& res){
+// bool srv_stop_mdriver_cb(mdriver::TNBMNSStateTransition::Request& req,mdriver::TNBMNSStateTransition::Response& res){
 //     //set the buck en flags here to true, they will be set to false once a single Ethernet package has been sent
 //     for(int i=0; i<NO_CHANNELS; i++)
 //         m_stop_flags[i]=req.enable[i];
@@ -394,7 +394,7 @@ void msg_des_freqs_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg){
 // }
 
 unsigned int send_counter=0;
-void tnb_mns_driver_timer_cb(){
+void mdriver_timer_cb(){
     //ROS_DEBUG("Entering Timer Handler...");
     RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Entering Timer Handler...");
     //apply the first order time constant [pre-filter]
@@ -468,7 +468,7 @@ void tnb_mns_driver_timer_cb(){
     //     else{
     //         memcpy(&m_last_system_report,bytes_received,sizeof(tnb_mns_msg_sysstate));
     //         if(send_counter%TNB_MNS_STATUS_DOWNSAMPLE==0){
-    //             auto tnbmns_status=tnb_mns_driver::msg::TnbMnsStatus();
+    //             auto tnbmns_status=mdriver::msg::Status();
     //             for(int i=0; i<NO_CHANNELS; i++){
     //                 tnbmns_status.currents_reg[i]=m_last_system_report.currents[i]*1e-3;
     //                 tnbmns_status.states[i]=m_last_system_report.states[i];
@@ -499,7 +499,7 @@ void tnb_mns_driver_timer_cb(){
 
 //main
 int main(int argc,char** argv){
-    //ros::init(argc, argv, "tnb_mns_driver_node",ros::init_options::NoSigintHandler);
+    //ros::init(argc, argv, "mdriver_node",ros::init_options::NoSigintHandler);
     rclcpp::init(argc,argv);
 
     //ROS_INFO("startup");
@@ -509,7 +509,7 @@ int main(int argc,char** argv){
     signal(SIGINT, mySigintHandler);
 
     //ros::NodeHandle nh("~");
-    auto nh=std::make_shared<rclcpp::Node>("tnb_mns_driver_node");
+    auto nh=std::make_shared<rclcpp::Node>("mdriver_node");
 
     //init ttycomm
     if(hardware_connected){
@@ -531,8 +531,8 @@ int main(int argc,char** argv){
     // TODO : create a magnetic field model
 
     //main timer shows callback function send the driver messages
-    rclcpp::TimerBase::SharedPtr timer = nh->create_wall_timer(std::chrono::milliseconds(long(1e3*send_interval)), tnb_mns_driver_timer_cb);
-    //ros::Timer timer = nhcreateTimer(ros::Duration(send_interval), tnb_mns_driver_timer_cb);
+    rclcpp::TimerBase::SharedPtr timer = nh->create_wall_timer(std::chrono::milliseconds(long(1e3*send_interval)), mdriver_timer_cb);
+    //ros::Timer timer = nhcreateTimer(ros::Duration(send_interval), mdriver_timer_cb);
     //ROS_INFO("Sending data packets at an interval of %f ms",send_interval*1e3);
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Sending data packets at an interval of %f ms",send_interval*1e3);
 
@@ -543,28 +543,28 @@ int main(int argc,char** argv){
     }
 
     //publisher node for TNB_MNS_STATUS
-    tnb_mns_state_publisher=nh->create_publisher<tnb_mns_driver::msg::TnbMnsStatus>("/tnb_mns_driver/system_state", 1);
-    //tnb_mns_state_publisher = nh.advertise<tnb_mns_driver::TnbMnsStatus>("/tnb_mns_driver/system_state", 1);
+    tnb_mns_state_publisher=nh->create_publisher<mdriver::msg::Status>("/mdriver/system_state", 1);
+    //tnb_mns_state_publisher = nh.advertise<mdriver::Status>("/mdriver/system_state", 1);
 
     //register services
-    srv_enable_tnb_mns_driver=nh->create_service<tnb_mns_driver::srv::Enable>("/tnb_mns_driver/enable",&srv_enable_tnb_mns_driver_cb);
-    srv_stop_tnb_mns_driver=nh->create_service<tnb_mns_driver::srv::Stop>("/tnb_mns_driver/stop",&srv_stop_tnb_mns_driver_cb);
-    srv_run_regular=nh->create_service<tnb_mns_driver::srv::RunRegular>("/tnb_mns_driver/run_regular",&srv_run_regular_cb);
-    srv_run_resonant=nh->create_service<tnb_mns_driver::srv::RunResonant>("/tnb_mns_driver/run_resonant",&srv_run_resonant_cb);
-    // //srv_enable_tnb_mns_driver=nh.advertiseService("/tnb_mns_driver/enable",srv_enable_tnb_mns_driver_cb);
-    // //srv_stop_tnb_mns_driver=nh.advertiseService("/tnb_mns_driver/stop",srv_stop_tnb_mns_driver_cb);
-    // //srv_run_regular=nh.advertiseService("/tnb_mns_driver/run_regular",srv_run_regular_cb);
-    // //srv_run_resonant=nh.advertiseService("/tnb_mns_driver/run_resonant",srv_run_resonant_cb);
+    srv_enable_mdriver=nh->create_service<mdriver::srv::Enable>("/mdriver/enable",&srv_enable_mdriver_cb);
+    srv_stop_mdriver=nh->create_service<mdriver::srv::Stop>("/mdriver/stop",&srv_stop_mdriver_cb);
+    srv_run_regular=nh->create_service<mdriver::srv::RunRegular>("/mdriver/run_regular",&srv_run_regular_cb);
+    srv_run_resonant=nh->create_service<mdriver::srv::RunResonant>("/mdriver/run_resonant",&srv_run_resonant_cb);
+    // //srv_enable_mdriver=nh.advertiseService("/mdriver/enable",srv_enable_mdriver_cb);
+    // //srv_stop_mdriver=nh.advertiseService("/mdriver/stop",srv_stop_mdriver_cb);
+    // //srv_run_regular=nh.advertiseService("/mdriver/run_regular",srv_run_regular_cb);
+    // //srv_run_resonant=nh.advertiseService("/mdriver/run_resonant",srv_run_resonant_cb);
 
     // //register subscribers
-    des_currents_reg_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/tnb_mns_driver/des_currents_reg",64,msg_des_currents_reg_cb);
-    des_duties_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/tnb_mns_driver/des_duties",64,msg_des_duties_reg_cb);
-    des_currents_res_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/tnb_mns_driver/des_currents_res",64,msg_des_currents_res_cb);
-    des_freqs_res=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/tnb_mns_driver/des_freqs_res",64,msg_des_freqs_cb);
-    // des_currents_reg_subs=nh.subscribe("/tnb_mns_driver/des_currents_reg",64,msg_des_currents_reg_cb);
-    // des_duties_subs=nh.subscribe("/tnb_mns_driver/des_duties",64,msg_des_duties_reg_cb);
-    // des_currents_res_subs=nh.subscribe("/tnb_mns_driver/des_currents_res",64,msg_des_currents_res_cb);
-    // des_freqs_res=nh.subscribe("/tnb_mns_driver/des_freqs_res",64,msg_des_freqs_cb);
+    des_currents_reg_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_currents_reg",64,msg_des_currents_reg_cb);
+    des_duties_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_duties",64,msg_des_duties_reg_cb);
+    des_currents_res_subs=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_currents_res",64,msg_des_currents_res_cb);
+    des_freqs_res=nh->create_subscription<std_msgs::msg::Float32MultiArray>("/mdriver/des_freqs_res",64,msg_des_freqs_cb);
+    // des_currents_reg_subs=nh.subscribe("/mdriver/des_currents_reg",64,msg_des_currents_reg_cb);
+    // des_duties_subs=nh.subscribe("/mdriver/des_duties",64,msg_des_duties_reg_cb);
+    // des_currents_res_subs=nh.subscribe("/mdriver/des_currents_res",64,msg_des_currents_res_cb);
+    // des_freqs_res=nh.subscribe("/mdriver/des_freqs_res",64,msg_des_freqs_cb);
 
     //ROS_INFO("Start spinning");
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Start spinning");
