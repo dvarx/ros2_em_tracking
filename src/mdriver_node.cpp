@@ -359,40 +359,38 @@ void mdriver_timer_cb() {
     }
   }
   // check if TCP packages have been received
-  // ROS_DEBUG("Reading RECV Buffer");
-  //  RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Reading RECV Buffer");
-  //  uint8_t bytes_received[2048];
-  //  int bytes_read=recv(sock_cli,bytes_received,2048,0);
-  //  if(bytes_read>0){
-  //      //ROS_DEBUG("Received %d bytes...",bytes_read);
-  //      RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received %d bytes...",bytes_read);
-  //      if(bytes_read!=sizeof(tnb_mns_msg_sysstate)){
-  //          reset_currents();
-  //          RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received %d bytes : However, message size
-  //          from UCU should be %d",bytes_read,sizeof(tnb_mns_msg_sysstate));
-  //          //ROS_DEBUG("Received %d bytes : However, message size from UCU should be
-  //          %d",bytes_read,sizeof(tnb_mns_msg_sysstate));
-  //      }
-  //      else{
-  //          memcpy(&m_last_system_report,bytes_received,sizeof(tnb_mns_msg_sysstate));
-  //          if(send_counter%TNB_MNS_STATUS_DOWNSAMPLE==0){
-  //              auto tnbmns_status=mdriver::msg::Status();
-  //              for(int i=0; i<NO_CHANNELS; i++){
-  //                  tnbmns_status.currents_reg[i]=m_last_system_report.currents[i]*1e-3;
-  //                  tnbmns_status.states[i]=m_last_system_report.states[i];
-  //                  tnbmns_status.duties[i]=(double)(m_last_system_report.duties[i])/((double)(65535.0));
-  //                  tnbmns_status.res_freqs[i]=m_last_system_report.freqs[i]*1e-3;
-  //                  tnbmns_status.dclink_voltages[i]=m_last_system_report.dclink_voltages[i]*1e-3;
-  //              }
-  //              tnb_mns_state_publisher->publish(tnbmns_status);
-  //          }
-  //      }
-  //  }
-  //  if(bytes_read==-1){
-  //      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"),"Error reading from socket:
-  //      %s",strerror(errno));
-  //      //ROS_ERROR("Error reading from socket: %s",strerror(errno));
-  //  }
+  RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Reading RECV Buffer");
+  uint8_t bytes_received[2048];
+  int bytes_read=recv(sock_cli,bytes_received,2048,0);
+  if(bytes_read>0){
+      //ROS_DEBUG("Received %d bytes...",bytes_read);
+      RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received %d bytes...",bytes_read);
+      if(bytes_read!=sizeof(tnb_mns_msg_sysstate)){
+          reset_currents();
+          RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Received %d bytes : However, message size from UCU should be %d",
+          bytes_read,sizeof(tnb_mns_msg_sysstate));
+      }
+      else{
+          memcpy(&m_last_system_report,bytes_received,sizeof(tnb_mns_msg_sysstate));
+          RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Current 1 %d",m_last_system_report.currents[0]);
+          if(send_counter%TNB_MNS_STATUS_DOWNSAMPLE==0){
+              auto tnbmns_status=mdriver::msg::Status();
+              for(int i=0; i<NO_CHANNELS; i++){
+                  tnbmns_status.currents_reg[i]=m_last_system_report.currents[i]*1e-3;
+                  tnbmns_status.states[i]=m_last_system_report.states[i];
+                  tnbmns_status.duties[i]=(double)(m_last_system_report.duties[i])/((double)(65535.0));
+                  tnbmns_status.res_freqs[i]=m_last_system_report.freqs[i]*1e-3;
+                  tnbmns_status.dclink_voltages[i]=m_last_system_report.dclink_voltages[i]*1e-3;
+              }
+              tnb_mns_state_publisher->publish(tnbmns_status);
+          }
+      }
+  }
+  if(bytes_read==-1){
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"),"Error reading from socket:%s",
+      strerror(errno));
+      //ROS_ERROR("Error reading from socket: %s",strerror(errno));
+  }
 
   // store the sent packet for later
   for (int i = 0; i < NO_CHANNELS; i++) m_des_currents_mA_prev[i] = m_des_currents_mA_filtered[i];
