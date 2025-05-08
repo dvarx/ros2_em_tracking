@@ -17,10 +17,6 @@ set(msg_files
 )
 
 set(srv_files
-  "srv/Enable.srv"
-  "srv/RunRegular.srv"
-  "srv/RunResonant.srv"
-  "srv/Stop.srv"
   "srv/StateTransition.srv")
 
 add_executable(mdriver_node src/mdriver_node.cpp)
@@ -48,7 +44,8 @@ ament_python_install_package(${PROJECT_NAME}_py)
 #note: had to add '_py' suffix to the python source and install directory to prevent `ament_python_install_package()` from failing
 #see also https://github.com/ament/ament_cmake/issues/514
 install(PROGRAMS
-  mdriver_py/driver_test.py
+  mdriver_py/mdriver_node.py
+  mdriver_py/gui.py
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(rosidl_default_runtime)

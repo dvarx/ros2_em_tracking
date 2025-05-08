@@ -6,9 +6,7 @@
 #include <std_msgs/msg/float32_multi_array.hpp>
 #include <vector>
 
-#include "mdriver/srv/enable.hpp"
-#include "mdriver/srv/run_regular.hpp"
-#include "mdriver/srv/stop.hpp"
+#include "mdriver/srv/state_transition.hpp"
 
 using namespace std::chrono_literals;
 
@@ -29,12 +27,12 @@ class MDriverTestNode : public rclcpp::Node {
 
     // put the driver into `ENABLE` mode
     RCLCPP_INFO(this->get_logger(), "Enabling driver");
-    client_enable = this->create_client<mdriver::srv::Enable>("/mdriver/enable");
+    client_enable = this->create_client<mdriver::srv::StateTransition>("/mdriver/enable");
     while (!client_enable->wait_for_service(1s)) {
       RCLCPP_INFO(this->get_logger(), "Waiting for enable service...");
     }
     std::array<bool, 6> enablearr = {true, true, true, true, true, true};
-    auto request = std::make_shared<mdriver::srv::Enable::Request>();
+    auto request = std::make_shared<mdriver::srv::StateTransition::Request>();
     request->enable = enablearr;
     // async_send_request is non-blocking
     auto result = client_enable->async_send_request(request);
@@ -47,12 +45,12 @@ class MDriverTestNode : public rclcpp::Node {
 
     // put the driver into `RUN_REGULAR_MODE`
     RCLCPP_INFO(this->get_logger(), "Putting driver into RUN_REGULAR mode");
-    client_runregular = this->create_client<mdriver::srv::RunRegular>("mdriver/run_regular");
+    client_runregular = this->create_client<mdriver::srv::StateTransition>("mdriver/run_regular");
     while (!client_runregular->wait_for_service(1s)) {
       RCLCPP_INFO(this->get_logger(), "Waiting for RUN_REGULAR service...");
     }
     std::array<bool, 6> runregarray = {true, true, true, true, true, true};
-    auto runreg_request = std::make_shared<mdriver::srv::RunRegular::Request>();
+    auto runreg_request = std::make_shared<mdriver::srv::StateTransition::Request>();
     runreg_request->enable = runregarray;
     auto runreg_result = client_runregular->async_send_request(runreg_request);
     if (!(rclcpp::spin_until_future_complete(this->get_node_base_interface(), runreg_result) ==
@@ -63,7 +61,7 @@ class MDriverTestNode : public rclcpp::Node {
     rclcpp::sleep_for(1s);
 
     // register a stop client
-    client_stop = this->create_client<mdriver::srv::Stop>("/mdriver/stop");
+    client_stop = this->create_client<mdriver::srv::StateTransition>("/mdriver/stop");
     while (!client_stop->wait_for_service(1s)) {
       RCLCPP_INFO(this->get_logger(), "Waiting for STOP service");
     }
@@ -78,7 +76,7 @@ class MDriverTestNode : public rclcpp::Node {
 
   ~MDriverTestNode() {
     // call the stop node before terminating
-    auto req = std::make_shared<mdriver::srv::Stop::Request>();
+    auto req = std::make_shared<mdriver::srv::StateTransition::Request>();
     std::array<bool, 6> stoparr = {true, true, true, true, true, true};
     req->enable = stoparr;
     auto res = client_stop->async_send_request(req);
@@ -93,9 +91,9 @@ class MDriverTestNode : public rclcpp::Node {
  private:
   rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr currents_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Client<mdriver::srv::Enable>::SharedPtr client_enable;
-  rclcpp::Client<mdriver::srv::RunRegular>::SharedPtr client_runregular;
-  rclcpp::Client<mdriver::srv::Stop>::SharedPtr client_stop;
+  rclcpp::Client<mdriver::srv::StateTransition>::SharedPtr client_enable;
+  rclcpp::Client<mdriver::srv::StateTransition>::SharedPtr client_runregular;
+  rclcpp::Client<mdriver::srv::StateTransition>::SharedPtr client_stop;
   // duration is defined in multiples of 1/1000 seconds (i.e. milliseconds)
   const std::chrono::duration<long long, std::ratio<1, 1000>> delta_T_;
   const double i_amp_;

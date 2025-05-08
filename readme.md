@@ -24,3 +24,14 @@ This folder contains multiple packages that are used to control the TNBeMNS ("Mi
 ## Test Nodes
 
 - `mdriver_node_test` is a test node which puts the driver in the `RUN_REGULAR` mode and applied a sinusoidal output voltage on channel 1. The node demonstrated basic control of the driver.
+
+## Terminal testing
+To test the `mdriver` hardware, the following ROS2 terminal commands can be used
+
+    ros2 run mdriver mdriver_node
+    ros2 service call /mdriver/enable mdriver/srv/StateTransition "{enable: [true, true, true, true, true, true]}"
+    ros2 service call /mdriver/run_regular mdriver/srv/StateTransition "{enable: [true, true, true, false, false, false]}"
+
+    ros2 topic pub /mdriver/des_currents_reg std_msgs/msg/Float32MultiArray "{layout: {}, data: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]}" -1
+
+    ros2 service call /mdriver/stop mdriver/srv/StateTransition "{enable: [true, true, true, true, true, true]}"

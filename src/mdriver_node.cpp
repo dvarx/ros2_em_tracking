@@ -5,12 +5,7 @@
 #include <std_msgs/msg/u_int32_multi_array.hpp>
 
 #include "mdriver/msg/status.hpp"
-#include "mdriver/srv/enable.hpp"
-#include "mdriver/srv/run_regular.hpp"
-#include "mdriver/srv/run_resonant.hpp"
 #include "mdriver/srv/state_transition.hpp"
-#include "mdriver/srv/stop.hpp"
-// #include "mdriver/TNBMNSStateTransition.h"
 #include "statemachine.h"
 
 // ethernet / ip related includes
@@ -76,10 +71,10 @@ rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr des_duties_sub
 
 // service handles
 // ros::ServiceServer srv_enable_mdriver;
-rclcpp::Service<mdriver::srv::Enable>::SharedPtr srv_enable_mdriver;
-rclcpp::Service<mdriver::srv::RunRegular>::SharedPtr srv_run_regular;
-rclcpp::Service<mdriver::srv::RunResonant>::SharedPtr srv_run_resonant;
-rclcpp::Service<mdriver::srv::Stop>::SharedPtr srv_stop_mdriver;
+rclcpp::Service<mdriver::srv::StateTransition>::SharedPtr srv_enable_mdriver;
+rclcpp::Service<mdriver::srv::StateTransition>::SharedPtr srv_run_regular;
+rclcpp::Service<mdriver::srv::StateTransition>::SharedPtr srv_run_resonant;
+rclcpp::Service<mdriver::srv::StateTransition>::SharedPtr srv_stop_mdriver;
 
 // state variables
 bool enable_input_lowpass = true;
@@ -220,32 +215,32 @@ bool init_comm(void) {
   return true;
 }
 
-void srv_run_regular_cb(const std::shared_ptr<mdriver::srv::RunRegular::Request> req,
-                        std::shared_ptr<mdriver::srv::RunRegular::Response> response) {
+void srv_run_regular_cb(const std::shared_ptr<mdriver::srv::StateTransition::Request> req,
+                        std::shared_ptr<mdriver::srv::StateTransition::Response> response) {
   // set the buck en flags here to true, they will be set to false once a single Ethernet package
   // has been sent
   for (int i = 0; i < NO_CHANNELS; i++) m_run_reg_flags[i] = req->enable[i];
   response->success = true;
 }
 
-void srv_run_resonant_cb(const std::shared_ptr<mdriver::srv::RunResonant::Request> req,
-                         std::shared_ptr<mdriver::srv::RunResonant::Response> res) {
+void srv_run_resonant_cb(const std::shared_ptr<mdriver::srv::StateTransition::Request> req,
+                         std::shared_ptr<mdriver::srv::StateTransition::Response> res) {
   // set the buck en flags here to true, they will be set to false once a single Ethernet package
   // has been sent
   for (int i = 0; i < NO_CHANNELS; i++) m_run_res_flags[i] = req->enable[i];
   res->success = true;
 }
 
-void srv_enable_mdriver_cb(const std::shared_ptr<mdriver::srv::Enable::Request> req,
-                           std::shared_ptr<mdriver::srv::Enable::Response> resp) {
+void srv_enable_mdriver_cb(const std::shared_ptr<mdriver::srv::StateTransition::Request> req,
+                           std::shared_ptr<mdriver::srv::StateTransition::Response> resp) {
   // set the buck en flags here to true, they will be set to false once a single Ethernet package
   // has been sent
   for (int i = 0; i < NO_CHANNELS; i++) m_buck_flags[i] = req->enable[i];
   resp->success = true;
 }
 
-void srv_stop_mdriver_cb(const std::shared_ptr<mdriver::srv::Stop::Request> req,
-                         std::shared_ptr<mdriver::srv::Stop::Response> res) {
+void srv_stop_mdriver_cb(const std::shared_ptr<mdriver::srv::StateTransition::Request> req,
+                         std::shared_ptr<mdriver::srv::StateTransition::Response> res) {
   // set the buck en flags here to true, they will be set to false once a single Ethernet package
   // has been sent
   for (int i = 0; i < NO_CHANNELS; i++) m_stop_flags[i] = req->enable[i];
@@ -445,12 +440,12 @@ int main(int argc, char **argv) {
 
   // register services
   srv_enable_mdriver =
-      nh->create_service<mdriver::srv::Enable>("/mdriver/enable", &srv_enable_mdriver_cb);
-  srv_stop_mdriver = nh->create_service<mdriver::srv::Stop>("/mdriver/stop", &srv_stop_mdriver_cb);
+      nh->create_service<mdriver::srv::StateTransition>("/mdriver/enable", &srv_enable_mdriver_cb);
+  srv_stop_mdriver = nh->create_service<mdriver::srv::StateTransition>("/mdriver/stop", &srv_stop_mdriver_cb);
   srv_run_regular =
-      nh->create_service<mdriver::srv::RunRegular>("/mdriver/run_regular", &srv_run_regular_cb);
+      nh->create_service<mdriver::srv::StateTransition>("/mdriver/run_regular", &srv_run_regular_cb);
   srv_run_resonant =
-      nh->create_service<mdriver::srv::RunResonant>("/mdriver/run_resonant", &srv_run_resonant_cb);
+      nh->create_service<mdriver::srv::StateTransition>("/mdriver/run_resonant", &srv_run_resonant_cb);
 
   // //register subscribers
   des_currents_reg_subs = nh->create_subscription<std_msgs::msg::Float32MultiArray>(

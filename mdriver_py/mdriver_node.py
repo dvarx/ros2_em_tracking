@@ -2,9 +2,7 @@
 
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
-from mdriver.srv import Enable
-from mdriver.srv import RunRegular
-from mdriver.srv import Stop
+from mdriver.srv import StateTransition
 import time
 import rclpy
 
@@ -30,7 +28,7 @@ class MDriverNode(Node):
 
         # Service client for ENABLE
         self.enable_cli = self.create_client(
-            Enable,
+            StateTransition,
             "/mdriver/enable"
         )
         while not self.enable_cli.wait_for_service(timeout_sec=1.0):
@@ -38,7 +36,7 @@ class MDriverNode(Node):
 
         # Service client for RUN_REGULAR
         self.run_regular_cli = self.create_client(
-            RunRegular,
+            StateTransition,
             "/mdriver/run_regular"
         )
         while not self.run_regular_cli.wait_for_service(timeout_sec=1.0):
@@ -46,36 +44,28 @@ class MDriverNode(Node):
 
         # Service client for STOP
         self.stop_cli = self.create_client(
-            Stop,
+            StateTransition,
             "/mdriver/stop"
         )
         while not self.stop_cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for '/mdriver/stop' service...")
 
-        self.enable_driver()
-        time.sleep(1)
-        self.run_regular_driver()
-        time.sleep(1)
-        self.control_magnets()
-        time.sleep(1)
-        self.stop_driver()
-
     def enable_driver(self):
-        request = Enable.Request()
+        request = StateTransition.Request()
         request.enable = [True] * 6
         future = self.enable_cli.call_async(request)
         self.get_logger().info("Sending 'ENABLE' request...")
         rclpy.spin_until_future_complete(self, future)
 
     def run_regular_driver(self):
-        request = RunRegular.Request()
+        request = StateTransition.Request()
         request.enable = [True] * 6
         future = self.run_regular_cli.call_async(request)
         self.get_logger().info("Sending 'RUN_REGULAR' request...")
         rclpy.spin_until_future_complete(self, future)
 
     def stop_driver(self):
-        request = Stop.Request()
+        request = StateTransition.Request()
         request.enable = [True] * 6
         future = self.stop_cli.call_async(request)
         self.get_logger().info("Sending 'STOP' request...")
@@ -118,7 +108,15 @@ class MDriverNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = MDriverNode()
-    rclpy.spin(node)
+
+    node.enable_driver()
+    time.sleep(1)
+    node.run_regular_driver()
+    time.sleep(1)
+    node.control_magnets()
+    time.sleep(1)
+    node.stop_driver()
+
     node.destroy_node()
     rclpy.shutdown()
 
