@@ -1,0 +1,6 @@
+<launch>
+    <node name="pickup_node" pkg="em_tracking" exec="pickup_node">
+        <param name="sample_rate" value="200000" />
+        <param name="samples_per_channel" value="2000"/>
+    </node>
+</launch>

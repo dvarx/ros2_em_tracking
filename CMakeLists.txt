@@ -15,13 +15,18 @@ pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
 include_directories(include ${LIBUSB_DIRECTORIES} ${LIBDAQ_INCLUDE_DIRECTORIES})
 
-add_executable(pickup_node src/pickup_node.cpp)
+add_executable(pickup_node src/pickup_node.cpp src/errstrs.c)
 target_link_libraries(pickup_node ${LIBUSB_LIBRARIES} ${LIBDAQ_LIBRARIES})
 ament_target_dependencies(pickup_node rclcpp std_msgs)
 
+#install executables
 install(TARGETS
   pickup_node
   DESTINATION lib/${PROJECT_NAME})
+
+#install launch files
+install(DIRECTORY ${em_tracking_SOURCE_DIR}/launch/
+  DESTINATION share/${PROJECT_NAME})
 
 # find dependencies
 find_package(ament_cmake REQUIRED)

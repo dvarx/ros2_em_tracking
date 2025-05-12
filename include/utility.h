@@ -14,7 +14,11 @@
 
 #include "uldaq.h"
 
+extern const char* ul_error_strings[];
 
+inline const char* err_string(UlError err){
+	return ul_error_strings[err];
+}
 
 /****************************************************************************
  * Enum Conversion Functions
