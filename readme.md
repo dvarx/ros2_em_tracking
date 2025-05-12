@@ -4,25 +4,28 @@ This folder contains multiple packages that are used to control the TNBeMNS ("Mi
 
 * `mdriver`  package : this package implements the node `mdriver_node` to communicate with the mdriver hardware which controls the magnetic fields in the system.
 
+Ensure that the hardware and firmware of the `mdriver` corresponds to the versions in `version.txt`.
+
 ## Services
 
 | Service Name        | Data Type | Description                               |
 | ------------------- | --------- | ----------------------------------------- |
-| `tnb_mns_driver/Enable`      | `bool[] enable`    | if `enable[i]==true`, then channel i will transition from `READY` to `BUCK_ENABLED` |
-| `tnb_mns_driver/RunRegular`        | `bool[] enable`    | if `enable[i]==true` then channel i will transition from `BUCK_ENABLED` to `RUN_REGULAR`|
-| `tnb_mns_driver/RunResonant` | `bool[] enable`    | if `enable[i]==true` then channel i will transition from `BUCK_ENABLED` to `RUN_RESONANT` |
-| `tnb_mns_driver/Stop` | `bool[] enable`    | if `enable[i]==true` then channel i will transition from its current state to `READY` |
+| `/mdriver/enable`      | `bool[] enable`    | if `enable[i]==true`, then channel i will transition from `READY` to `BUCK_ENABLED` |
+| `/mdriver/run_regular`        | `bool[] enable`    | if `enable[i]==true` then channel i will transition from `BUCK_ENABLED` to `RUN_REGULAR`|
+| `/mdriver/run_resonant` | `bool[] enable`    | if `enable[i]==true` then channel i will transition from `BUCK_ENABLED` to `RUN_RESONANT` |
+| `/mdriver/stop` | `bool[] enable`    | if `enable[i]==true` then channel i will transition from its current state to `READY` |
 
 ## Topics
 
 | Topic Name               | Data Type    | Description                                                  |
 | ------------------------ | ------------ | ------------------------------------------------------------ |
-| `/tnb_mns_driver/des_currents_reg` | `float64[]` | desired currents for the 6 coils in [A] |
-| `/tnb_mns_driver/des_duties` | `float64[]` | desired duty cycles for the buck converter stage in interval [0.1,0.9] |
-| `/tnb_mns_driver/des_freqs` | `uint32[]` | desired frequencies in resonant mode in [mHz] |
+| `/mdriver/des_currents_reg` | `float64[]` | desired currents for the 6 coils in [A] |
+| `/mdriver/des_duties` | `float64[]` | desired duty cycles for the buck converter stage in interval [0.1,0.9] |
+| `/mdriver/des_freqs` | `uint32[]` | desired frequencies in resonant mode in [mHz] |
 
 ## Test Nodes
 
+- `gui.py` (`ros2 run mdriver gui.py`) runs a simple GUI that can be used to turn the system on and off, apply currents and display currents.
 - `mdriver_node_test` is a test node which puts the driver in the `RUN_REGULAR` mode and applied a sinusoidal output voltage on channel 1. The node demonstrated basic control of the driver.
 
 ## Terminal testing

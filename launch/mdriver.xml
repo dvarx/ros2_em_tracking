@@ -1,0 +1,5 @@
+<launch>
+    <node name="mdriver_node" pkg="mdriver" exec="mdriver_node">
+        <param name="status_msg_downsample" value="10" />
+    </node>
+</launch>

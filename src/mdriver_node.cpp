@@ -26,7 +26,7 @@
 #define NO_CHANNELS 6
 #define DEFAULT_RES_FREQ_MILLIHZ 10000000
 // this defines the downsampling for the TNB_MNS_STATUS topics
-#define TNB_MNS_STATUS_DOWNSAMPLE 10
+unsigned int status_msg_downsample=1;
 
 rclcpp::Publisher<mdriver::msg::Status>::SharedPtr tnb_mns_state_publisher;
 bool hardware_connected = true;
@@ -368,7 +368,7 @@ void mdriver_timer_cb() {
       else{
           memcpy(&m_last_system_report,bytes_received,sizeof(tnb_mns_msg_sysstate));
           RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),"Current 1 %d",m_last_system_report.currents[0]);
-          if(send_counter%TNB_MNS_STATUS_DOWNSAMPLE==0){
+          if(send_counter%status_msg_downsample==0){
               auto tnbmns_status=mdriver::msg::Status();
               for(int i=0; i<NO_CHANNELS; i++){
                   tnbmns_status.currents_reg[i]=m_last_system_report.currents[i]*1e-3;
@@ -401,11 +401,15 @@ void mdriver_timer_cb() {
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
 
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "startup");
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "staring mdriver node");
 
   signal(SIGINT, mySigintHandler);
 
   auto nh = std::make_shared<rclcpp::Node>("mdriver_node");
+
+  nh->declare_parameter("status_msg_downsample",1);
+  status_msg_downsample=nh->get_parameter("status_msg_downsample").as_int();
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "status messages will be downsamples by a factor of %d",status_msg_downsample);
 
   // init ttycomm
   if (hardware_connected) {

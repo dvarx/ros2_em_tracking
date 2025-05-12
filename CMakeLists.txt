@@ -37,6 +37,10 @@ install(TARGETS
   mdriver_node_test
   DESTINATION lib/${PROJECT_NAME})
 
+#install launch files
+install(DIRECTORY ${mdriver_SOURCE_DIR}/launch/
+  DESTINATION share/${PROJECT_NAME})
+
 #note: had to add '_py' suffix to the python source and install directory to prevent `ament_python_install_package()` from failing
 #see also https://github.com/ament/ament_cmake/issues/514
 ament_python_install_package(${PROJECT_NAME}_py)

@@ -1,0 +1,2 @@
+Firmware:   60c16
+Hardware:   v1.00

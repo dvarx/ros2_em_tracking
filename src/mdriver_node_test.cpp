@@ -15,8 +15,8 @@ class MDriverTestNode : public rclcpp::Node {
   MDriverTestNode()
       : Node("mdriver_node_test"),
         delta_T_(10ms),
-        i_amp_(2.0),
-        omega_(2.0 * M_PI),
+        i_amp_(1.0),
+        omega_(1.0 * M_PI),
         currents_(6, 0.0),
         msg_() {
     RCLCPP_INFO(this->get_logger(), "Starting up mdriver test node");
