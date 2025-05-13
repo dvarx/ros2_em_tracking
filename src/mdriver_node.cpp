@@ -59,8 +59,10 @@ struct sockaddr_in servaddr;  // address struct
 #define BUFFER_SIZE 1024
 uint8_t send_buffer[1024];
 const float send_interval = 10e-3;    // defines the timerinterval of the send timer
-const float pre_filter_tau = 500e-3;  // time constant of the prefilter to limit energy feedback
+double pre_filter_tau = 500e-3;  // time constant of the prefilter to limit energy feedback
+bool use_prefilter=false;
 const unsigned int packets_per_second = (unsigned int)(1.0 / send_interval);
+rclcpp::Node::SharedPtr nh;
 
 // topic subscribers
 // ros::Subscriber des_currents_reg_subs;
@@ -298,11 +300,18 @@ void msg_des_freqs_cb(std_msgs::msg::Float32MultiArray::UniquePtr msg) {
 unsigned int send_counter = 0;
 void mdriver_timer_cb() {
   RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "Entering Timer Handler...");
+  pre_filter_tau=nh->get_parameter("prefilter_tau").as_double();
   // apply the first order time constant [pre-filter]
-  for (int i = 0; i < NO_CHANNELS; i++) {
-    m_des_currents_mA_filtered[i] =
-        pre_filter_tau / (pre_filter_tau + send_interval) * m_des_currents_mA_prev[i] +
-        send_interval / (pre_filter_tau + send_interval) * m_des_currents_mA[i];
+  if(nh->get_parameter("use_prefilter").as_bool()){
+    for (int i = 0; i < NO_CHANNELS; i++) {
+      m_des_currents_mA_filtered[i] =
+          pre_filter_tau / (pre_filter_tau + send_interval) * m_des_currents_mA_prev[i] +
+          send_interval / (pre_filter_tau + send_interval) * m_des_currents_mA[i];
+    }
+  }
+  else{
+    for(int i=0; i<NO_CHANNELS; i++)
+      m_des_currents_mA_filtered[i]=m_des_currents_mA[i];
   }
 
   // assemble the tnb_mns_message and send ethernet package
@@ -405,9 +414,12 @@ int main(int argc, char **argv) {
 
   signal(SIGINT, mySigintHandler);
 
-  auto nh = std::make_shared<rclcpp::Node>("mdriver_node");
+  nh = std::make_shared<rclcpp::Node>("mdriver_node");
 
   nh->declare_parameter("status_msg_downsample",1);
+  nh->declare_parameter("use_prefilter",true);
+  nh->declare_parameter("prefilter_tau",100e-3);
+
   status_msg_downsample=nh->get_parameter("status_msg_downsample").as_int();
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "status messages will be downsamples by a factor of %d",status_msg_downsample);
 

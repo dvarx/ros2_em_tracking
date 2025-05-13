@@ -1,0 +1,7 @@
+<launch>
+    <node name="mdriver_node_test" pkg="mdriver" exec="mdriver_node_test">
+        <param name="rectangular_current" value="true" />
+        <param name="amplitude" value="1.0" />
+        <param name="frequency" value="1.0" />
+    </node>
+</launch>

@@ -23,10 +23,22 @@ Ensure that the hardware and firmware of the `mdriver` corresponds to the versio
 | `/mdriver/des_duties` | `float64[]` | desired duty cycles for the buck converter stage in interval [0.1,0.9] |
 | `/mdriver/des_freqs` | `uint32[]` | desired frequencies in resonant mode in [mHz] |
 
+## Parameters
+
+| Node | Parameter | Type | Description |
+|---|---|---|---|
+| `mdriver_node` | `use_prefilter` | `bool` | If set, the current commands will be first-order low pass filtered using `prefilter_tau` |
+| `mdriver_node` | `prefilter_tau` | `double` | Time constant of the first order prefilter |
+| `mdriver_node` | `status_msg_downsample` | `int` | The node will publish every n-th status report it receives from the `mdriver`, where n is the value of this parameter |
+| `mdriver_node_test` | `rectangular_current` | `bool` | If set, a rectangular current will be tracked instead of a sinusoidal one |
+| `mdriver_node_test` | `amplitude` | `double` | Amplitude to be tracked in [A] |
+| `mdriver_node_test` | `frequency` | `double` | Signal frequency to be tracked in [Hz] |
+
+
 ## Test Nodes
 
 - `gui.py` (`ros2 run mdriver gui.py`) runs a simple GUI that can be used to turn the system on and off, apply currents and display currents.
-- `mdriver_node_test` is a test node which puts the driver in the `RUN_REGULAR` mode and applied a sinusoidal output voltage on channel 1. The node demonstrated basic control of the driver.
+- `mdriver_node_test` is a test node which puts the driver in the `RUN_REGULAR` mode and applied a sinusoidal output voltage on channel 1. The node demonstrated basic control of the driver. Run using `ros2 launch mdriver_test.xml`.
 
 ## Terminal testing
 To test the `mdriver` hardware, the following ROS2 terminal commands can be used

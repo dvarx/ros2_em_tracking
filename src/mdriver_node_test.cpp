@@ -5,10 +5,19 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float32_multi_array.hpp>
 #include <vector>
+#include <signal.h>
 
 #include "mdriver/srv/state_transition.hpp"
 
 using namespace std::chrono_literals;
+
+bool rectangular_current=true;
+void sig_int_handler(int sig) {
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Shutdown using SIGINT");
+
+  // All the default sigint handler does is call shutdown()
+  rclcpp::shutdown();
+}
 
 class MDriverTestNode : public rclcpp::Node {
  public:
@@ -16,12 +25,17 @@ class MDriverTestNode : public rclcpp::Node {
       : Node("mdriver_node_test"),
         delta_T_(10ms),
         i_amp_(1.0),
-        omega_(1.0 * M_PI),
+        freq_(1.0 * M_PI),
         currents_(6, 0.0),
         msg_() {
     RCLCPP_INFO(this->get_logger(), "Starting up mdriver test node");
 
     msg_.data.resize(6);
+
+    this->declare_parameter("rectangular_current",false);
+    this->declare_parameter("amplitude",1.0);
+    this->declare_parameter("frequency",1.0);
+
 
     // put the driver into run_regular mode
 
@@ -96,14 +110,25 @@ class MDriverTestNode : public rclcpp::Node {
   rclcpp::Client<mdriver::srv::StateTransition>::SharedPtr client_stop;
   // duration is defined in multiples of 1/1000 seconds (i.e. milliseconds)
   const std::chrono::duration<long long, std::ratio<1, 1000>> delta_T_;
-  const double i_amp_;
-  const double omega_;
+  double i_amp_;
+  double freq_;
   std::vector<double> currents_;
   std_msgs::msg::Float32MultiArray msg_;
 
   void mdriver_timer_cb() {
     rclcpp::Time current_time = this->get_clock()->now();
-    double current = i_amp_ * sin(omega_ * current_time.seconds());
+    double current;
+    i_amp_=this->get_parameter("amplitude").as_double();
+    freq_=this->get_parameter("frequency").as_double();
+    if(rectangular_current){
+      double relt=current_time.seconds()-int(current_time.seconds());
+      if(relt>0.5)
+        current=i_amp_;
+      else
+        current=-i_amp_;
+    }
+    else
+      current = i_amp_ * sin(2*M_PI*freq_ * current_time.seconds());
 
     for (size_t i = 0; i < msg_.data.size(); ++i) {
       msg_.data[i] = 0.0f;
@@ -117,6 +142,8 @@ class MDriverTestNode : public rclcpp::Node {
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
+  signal(SIGINT, sig_int_handler);
+
   rclcpp::spin(std::make_shared<MDriverTestNode>());
   rclcpp::shutdown();
   return 0;
