@@ -58,7 +58,7 @@ struct sockaddr_in servaddr;  // address struct
 #define TNB_MNS_PORT 30
 #define BUFFER_SIZE 1024
 uint8_t send_buffer[1024];
-const float send_interval = 10e-3;    // defines the timerinterval of the send timer
+double send_interval=10e-3;    // defines the timerinterval of the send timer
 double pre_filter_tau = 500e-3;  // time constant of the prefilter to limit energy feedback
 bool use_prefilter=false;
 const unsigned int packets_per_second = (unsigned int)(1.0 / send_interval);
@@ -419,7 +419,7 @@ int main(int argc, char **argv) {
   nh->declare_parameter("status_msg_downsample",1);
   nh->declare_parameter("use_prefilter",true);
   nh->declare_parameter("prefilter_tau",100e-3);
-
+  nh->declare_parameter("send_frequency",100.0);
   status_msg_downsample=nh->get_parameter("status_msg_downsample").as_int();
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "status messages will be downsamples by a factor of %d",status_msg_downsample);
 
@@ -440,6 +440,7 @@ int main(int argc, char **argv) {
   }
 
   // main timer shows callback function send the driver messages
+  send_interval=1.0/nh->get_parameter("send_frequency").as_double();
   rclcpp::TimerBase::SharedPtr timer =
       nh->create_wall_timer(std::chrono::milliseconds(long(1e3 * send_interval)), mdriver_timer_cb);
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sending data packets at an interval of %f ms",

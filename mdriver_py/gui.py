@@ -73,8 +73,8 @@ class SimpleGUI(QWidget):
         for i in range(0,Ncoils):
             sbox=QDoubleSpinBox()
             self.sboxs.append(sbox)
-            sbox.setMinimum(-5)
-            sbox.setMaximum(5)
+            sbox.setMinimum(-7)
+            sbox.setMaximum(7)
             sbox.setSingleStep(0.1)
             sbox.valueChanged.connect(self.des_currents_changed)
 

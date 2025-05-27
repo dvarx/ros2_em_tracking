@@ -50,6 +50,7 @@ ament_python_install_package(${PROJECT_NAME}_py)
 install(PROGRAMS
   mdriver_py/mdriver_node.py
   mdriver_py/gui.py
+  mdriver_py/current_listener.py
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(rosidl_default_runtime)

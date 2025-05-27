@@ -1,7 +1,8 @@
 <launch>
     <node name="mdriver_node" pkg="mdriver" exec="mdriver_node">
-        <param name="status_msg_downsample" value="10" />
+        <param name="status_msg_downsample" value="1" />
         <param name="use_prefilter" value="false" />
         <param name="prefilter_tau" value="0.1" />
+        <param name="send_frequency" value="500.0" />
     </node>
 </launch>
