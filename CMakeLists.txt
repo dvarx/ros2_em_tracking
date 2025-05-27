@@ -9,7 +9,6 @@ find_package(std_msgs REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(rclpy REQUIRED)
-
 include_directories(include)
 
 set(msg_files
