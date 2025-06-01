@@ -369,7 +369,7 @@ void mdriver_timer_cb() {
     if (bytes_read != sizeof(tnb_mns_msg_sysstate)) {
       reset_currents();
       RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"),
-                   "Received %d bytes : However, message size from UCU should be %d", bytes_read,
+                   "Received %d bytes : However, message size from UCU should be %lu", bytes_read,
                    sizeof(tnb_mns_msg_sysstate));
     } else {
       memcpy(&m_last_system_report, bytes_received, sizeof(tnb_mns_msg_sysstate));
