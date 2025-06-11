@@ -101,7 +101,6 @@ int main(int argc,char** argv){
 	int hasAI = 0;
 	int hasPacer = 0;
 	int numberOfChannels = 0;
-	int index = 0;
 
 	char inputModeStr[MAX_STR_LENGTH];
 	char rangeStr[MAX_STR_LENGTH];
@@ -111,7 +110,6 @@ int main(int argc,char** argv){
 
 	int i = 0;
 	int __attribute__((unused)) ret;
-	char c;
 
 	// Get descriptors for all of the available DAQ devices
 	check_err(ulGetDaqDeviceInventory(interfaceType, devDescriptors, &numDevs));
@@ -121,7 +119,7 @@ int main(int argc,char** argv){
 
 
 	//printf("Found %d DAQ device(s)\n", numDevs);
-	RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "found %n devices",numDevs);
+	RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "found %u devices",numDevs);
 	for (i = 0; i < (int) numDevs; i++)
 		RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"  [%d] %s: (%s)\n", i, devDescriptors[i].productName, devDescriptors[i].uniqueId);
 		//printf("  [%d] %s: (%s)\n", i, devDescriptors[i].productName, devDescriptors[i].uniqueId);
