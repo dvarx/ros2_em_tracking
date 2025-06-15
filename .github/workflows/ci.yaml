@@ -16,6 +16,9 @@ jobs:
         #stores github workspace in $GITHUB_WORKSPACE
 
       - name: Run build test within docker container
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
         run:  |
+              echo "building branch ${BRANCH_NAME}"
               docker pull dvarx/mdriver_build_24_04
-              docker run dvarx/mdriver_build_24_04
+              docker run -e BRANCH=$BRANCH_NAME dvarx/mdriver_build_24_04
