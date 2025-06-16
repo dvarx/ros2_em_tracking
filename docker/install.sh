@@ -32,7 +32,7 @@ sudo make install
 source /opt/ros/jazzy/setup.bash
 mkdir -p ros2_ws/src
 cd ros2_ws/src
-git clone https://github.com/dvarx/ros2_em_tracking.git
+git clone -b $BRANCH https://github.com/dvarx/ros2_em_tracking.git
 
 #install ROS2 dependencies
 rosdep init
