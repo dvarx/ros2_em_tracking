@@ -24,6 +24,8 @@ apt install -y ros-jazzy-ros-base
 source /opt/ros/jazzy/setup.bash
 mkdir -p ros2_ws/src
 cd ros2_ws/src
+#add SSH public key of GitHub to known hosts
+ssh-keyscan github.com >> ~/.ssh/known_hosts
 git clone --recurse-submodules -b $BRANCH https://github.com/dvarx/mdriver_ros2.git
 
 #install ROS2 dependencies
