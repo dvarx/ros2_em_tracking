@@ -53,7 +53,6 @@ install(PROGRAMS
   mdriver_py/mdriver_node.py
   mdriver_py/mdriver_gui.py
   mdriver_py/current_listener.py
-  mdriver_py/analyze_calibration.py
   emns_utils/magnetic_system.py
   DESTINATION lib/${PROJECT_NAME})
 

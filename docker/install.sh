@@ -24,7 +24,7 @@ apt install -y ros-jazzy-ros-base
 source /opt/ros/jazzy/setup.bash
 mkdir -p ros2_ws/src
 cd ros2_ws/src
-git clone -b $BRANCH https://github.com/dvarx/mdriver_ros2.git
+git clone --recurse-submodules -b $BRANCH https://github.com/dvarx/mdriver_ros2.git
 
 #install ROS2 dependencies
 rosdep init
