@@ -37,7 +37,7 @@ Ensure that the hardware and firmware of the `mdriver` corresponds to the versio
 
 ## Test Nodes
 
-- `gui.py` (`ros2 run mdriver gui.py`) runs a simple GUI that can be used to turn the system on and off, apply currents and display currents.
+- `mdriver_gui.py` (`ros2 run mdriver gui.py`) runs a simple GUI that can be used to turn the system on and off, apply currents and display currents.
 - `mdriver_node_test` is a test node which puts the driver in the `RUN_REGULAR` mode and applied a sinusoidal output voltage on channel 1. The node demonstrated basic control of the driver. Run using `ros2 launch mdriver_test.xml`.
 
 ## Terminal testing

@@ -1,0 +1,3 @@
+[submodule "emns_utils"]
+	path = emns_utils
+	url = git@github.com:dvarx/emns_utils.git

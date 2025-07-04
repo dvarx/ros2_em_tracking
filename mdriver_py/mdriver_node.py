@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+This script demonstrates the communication with the `MDriver` and defines a python wrapper class for communication with the `MDriver`
+"""
+
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 from mdriver.srv import StateTransition

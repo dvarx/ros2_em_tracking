@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+This script provided a basic GUI for sending currents to the MDriver and can be used for testing and debugging purposes
+"""
+
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QVBoxLayout, QDoubleSpinBox
 from PyQt5.QtCore import Qt, QThread
@@ -16,8 +20,8 @@ class ROS2Thread(QThread):
         self._running = True
 
     def run(self):
+        #start ROS2 event loop, this call will loop continuously and is blocking
         rclpy.spin(self._node)
-        print("ROS 2 spin ended.")
 
     def stop(self):
         self._running = False
@@ -25,7 +29,7 @@ class ROS2Thread(QThread):
         rclpy.shutdown()
         self.wait()
 
-class SimpleGUI(QWidget):
+class MDriverGUI(QWidget):
     def __init__(self,Ncoils):
         self.Ncoils=Ncoils
 
@@ -130,9 +134,8 @@ if __name__ == '__main__':
     # Create the QApplication instance
     app = QApplication(sys.argv)
 
-
     # Create the main window
-    gui = SimpleGUI(Ncoils=6)
+    gui = MDriverGUI(Ncoils=6)
 
     # Show the window
     gui.show()

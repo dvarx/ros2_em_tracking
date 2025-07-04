@@ -51,8 +51,10 @@ ament_python_install_package(${PROJECT_NAME}_py)
 #see also https://github.com/ament/ament_cmake/issues/514
 install(PROGRAMS
   mdriver_py/mdriver_node.py
-  mdriver_py/gui.py
+  mdriver_py/mdriver_gui.py
   mdriver_py/current_listener.py
+  mdriver_py/analyze_calibration.py
+  emns_utils/magnetic_system.py
   DESTINATION lib/${PROJECT_NAME})
 
 ament_export_dependencies(rosidl_default_runtime)
