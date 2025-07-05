@@ -52,6 +52,8 @@ ament_python_install_package(${PROJECT_NAME}_py)
 install(PROGRAMS
   mdriver_py/mdriver_node.py
   mdriver_py/mdriver_gui.py
+  mdriver_py/mdriver_field_gui.py
+  mdriver_py/mdriver_fieldgrad_gui.py
   mdriver_py/current_listener.py
   emns_utils/magnetic_system.py
   DESTINATION lib/${PROJECT_NAME})

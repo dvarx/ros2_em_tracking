@@ -37,8 +37,11 @@ Ensure that the hardware and firmware of the `mdriver` corresponds to the versio
 
 ## Test Nodes
 
-- `mdriver_gui.py` (`ros2 run mdriver gui.py`) runs a simple GUI that can be used to turn the system on and off, apply currents and display currents.
+- `mdriver_gui.py` (`ros2 run mdriver mdriver_gui.py`) runs a simple GUI that can be used to turn the system on and off, apply currents and display currents.
+- `mdriver_field_gui.py` (`ros2 run mdriver mdriver_field_gui.py`) runs a simple GUI that can be used to turn the system on and off and apply magnetic fields.
+- `mdriver_fieldgrad_gui.py` (`ros2 run mdriver mdriver_fieldgrad_gui.py`) runs a simple GUI that can be used to apply field and gradients.
 - `mdriver_node_test` is a test node which puts the driver in the `RUN_REGULAR` mode and applied a sinusoidal output voltage on channel 1. The node demonstrated basic control of the driver. Run using `ros2 launch mdriver_test.xml`.
+- `mdriver_node_test.py` defines a python wrapper class for accessing the `MDriver`
 
 ## Terminal testing
 To test the `mdriver` hardware, the following ROS2 terminal commands can be used

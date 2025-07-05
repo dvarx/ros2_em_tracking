@@ -75,6 +75,11 @@ class MDriverNode(Node):
         self.get_logger().info("Sending 'STOP' request...")
         rclpy.spin_until_future_complete(self, future)
 
+    def set_currents(self,currents):
+        des_currents_msg = Float32MultiArray()
+        des_currents_msg.data = list(currents)
+        self.currents_pub.publish(des_currents_msg)
+
     def control_magnets(self):
         # Message for the currently desired current vector
         des_currents_msg = Float32MultiArray()
