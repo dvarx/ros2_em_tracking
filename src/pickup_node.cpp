@@ -18,6 +18,7 @@ rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr pickup_publisher;
 #define MAX_DEV_COUNT  100
 #define MAX_STR_LENGTH 64
 #define MAX_SCAN_OPTIONS_LENGTH 256
+#define EXTERNAL_TRIGGERING
 const std::string PUBLISH_TOPIC="/pickup_node/voltage_frames";
 const std::string NODE_NAME="pickup_node";
 
@@ -62,7 +63,7 @@ int main(int argc,char** argv){
 
 	rclcpp::Node::SharedPtr nh=std::make_shared<rclcpp::Node>(NODE_NAME);
 	nh->declare_parameter("samples_per_channel",2000);
-	nh->declare_parameter("sample_rate",100000);
+	nh->declare_parameter("sample_rate",200000);
 
 	//publisher node for voltage_frames
 	pickup_publisher=nh->create_publisher<std_msgs::msg::Float32MultiArray>(PUBLISH_TOPIC,1);
@@ -95,7 +96,12 @@ int main(int argc,char** argv){
 	else{
 		RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "error reading SAMPLE_RATE parameter. parameter needs to be int.");
 	}
+	//if external triggering enabled, use external triger to start a scan conversion
+	#ifdef EXTERNAL_TRIGGERING
+	ScanOption scanOptions = (ScanOption) (SO_DEFAULTIO | SO_EXTTRIGGER);
+	#else
 	ScanOption scanOptions = (ScanOption) (SO_DEFAULTIO);
+	#endif
 	AInScanFlag flags = AINSCAN_FF_DEFAULT;
 
 	int hasAI = 0;
@@ -134,7 +140,6 @@ int main(int argc,char** argv){
 
 	// verify the specified device supports analog input
 	check_err(getDevInfoHasAi(daqDeviceHandle, &hasAI));
-	if(err)
 
 	// verify the specified device supports hardware pacing for analog input
 	check_err(getAiInfoHasPacer(daqDeviceHandle, &hasPacer));
@@ -160,7 +165,7 @@ int main(int argc,char** argv){
 	buffer = (double*) malloc(buffersize);
 	floatbuffer_msg.data = std::vector<float>(buffercount,0);
 	floatbuffer_msg.layout.dim.push_back(std_msgs::msg::MultiArrayDimension());
-	floatbuffer_msg.layout.dim[0].size=5000;
+	floatbuffer_msg.layout.dim[0].size=samplesPerChannel;
 	floatbuffer_msg.layout.dim[0].stride=1;
 	floatbuffer_msg.layout.dim.push_back(std_msgs::msg::MultiArrayDimension());
 	floatbuffer_msg.layout.dim[1].size=4;
@@ -180,7 +185,7 @@ int main(int argc,char** argv){
 	//------------------------------------------
 	// read data continusously and publish it
 	//------------------------------------------
-	rclcpp::Rate wait_rate(100);
+	rclcpp::Rate wait_rate(10000);
 	while(rclcpp::ok()){
 		//read data from the DAQ card
 		check_err(ulAInScan(daqDeviceHandle, lowChan, highChan, inputMode, range, samplesPerChannel, &rate, scanOptions, flags, buffer));
@@ -205,6 +210,5 @@ int main(int argc,char** argv){
 		
 		//publish the data
 		pickup_publisher->publish(floatbuffer_msg);
-		RCLCPP_DEBUG(rclcpp::get_logger("rclcpp"), "publish voltage frames");
 	}
 }

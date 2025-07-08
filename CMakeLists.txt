@@ -30,20 +30,23 @@ install(DIRECTORY ${em_tracking_SOURCE_DIR}/launch/
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
 
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
-  set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
-  set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
-endif()
+install(PROGRAMS
+  em_tracking_py/measurement_node.py
+  em_tracking_py/measurement_node_cal.py
+  em_tracking_py/signal_test.py
+  em_tracking_py/em_calibration_stepper_node.py
+  em_tracking_py/localization_node.py
+  emns_utils/magnetic_system.py
+  emns_utils/magnetic_tracking.py
+  stages_utils/three_axis_stage.py
+  stages_utils/utilities.py
+  DESTINATION lib/${PROJECT_NAME})
+
+# Install launch files.
+install(DIRECTORY
+  rviz
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ament_package()

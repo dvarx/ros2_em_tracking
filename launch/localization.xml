@@ -1,0 +1,16 @@
+<launch>
+    <!-- mdriver node -->
+    <node pkg="mdriver" exec="mdriver_node" name="mdriver_node" namespace="mdriver"/>
+
+    <!-- Node to interface with DAQ card (pickup node) -->
+    <node name="pickup_node" pkg="em_tracking" exec="pickup_node">
+        <param name="sample_rate" value="200000" />
+        <param name="samples_per_channel" value="2000"/>
+    </node>
+
+    <!-- Localization node -->
+    <node pkg="em_tracking" name="localization_node" exec="localization_node.py" output="screen"/>
+
+    <!-- RViz node -->
+    <node pkg="rviz2" exec="rviz2" name="rviz2" args="-d $(find-pkg-share em_tracking)/rviz/em_tracking_config.rviz" />
+</launch>

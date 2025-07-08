@@ -1,0 +1,6 @@
+[submodule "stages_utils"]
+	path = stages_utils
+	url = https://github.com/dvarx/stages_utils.git
+[submodule "emns_utils"]
+	path = emns_utils
+	url = git@github.com:dvarx/emns_utils.git
