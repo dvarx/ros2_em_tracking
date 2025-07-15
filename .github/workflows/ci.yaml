@@ -20,4 +20,4 @@ jobs:
         run:  |
               echo "building branch ${BRANCH_NAME}"
               docker pull dvarx/em_tracking_build_24_04
-              docker run -e BRANCH=$BRANCH dvarx/em_tracking_build_24_04
+              docker run -e BRANCH=$BRANCH_NAME dvarx/em_tracking_build_24_04

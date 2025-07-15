@@ -5,7 +5,7 @@ export DEBIAN_FRONTEND=noninteractive
 #install tzdata non-interactively
 apt update && apt install sudo curl git -y
 apt-get install tzdata -y
-apt update && apt install locales
+apt update && apt install locales -y
 locale-gen en_US en_US.UTF-8
 update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -27,12 +27,13 @@ tar -xvjf libuldaq-1.2.1.tar.bz2
 cd libuldaq-1.2.1
 ./configure && make
 sudo make install
+cd ..
 
 #create ROS2 workspace and check out sourcecode
 source /opt/ros/jazzy/setup.bash
 mkdir -p ros2_ws/src
 cd ros2_ws/src
-git clone -b $BRANCH https://github.com/dvarx/ros2_em_tracking.git
+git clone --recurse-submodules -b $BRANCH https://github.com/dvarx/ros2_em_tracking.git
 
 #install ROS2 dependencies
 rosdep init
