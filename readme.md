@@ -1,10 +1,11 @@
 # MDriver ROS2 Package
 
-This folder contains multiple packages that are used to control the TNBeMNS ("Mini-Navion" System). This folder contains:
+This folder contains the `MDriver` ROS2 package that is used to control the TNBeMNS ("Mini-Navion" System).
 
-* `mdriver`  package : this package implements the node `mdriver_node` to communicate with the mdriver hardware which controls the magnetic fields in the system.
+* Compatible hardware version is `MDriver v1.0` ([hardware repository](https://github.com/dvarx/mdriver_hw))
+* Compatibale firmware version is `10772f` ([firmware repo](https://github.com/dvarx/mdriver_fw))
 
-Ensure that the hardware and firmware of the `mdriver` corresponds to the versions in `version.txt`.
+![MDriver hardware v1.0](img/mdriver_hw.jpg)
 
 ## Services
 
