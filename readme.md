@@ -1,11 +1,11 @@
-# MDriver ROS2 Package
+# MDriver ROS2 Package for EM-Tracking
 
-This folder contains the `MDriver` ROS2 package that is used to control the TNBeMNS ("Mini-Navion" System).
+This folder contains the `MDriver` ROS2 package that is used to control the TNBeMNS ("Mini-Navion" System) for use with the electromagnetic tracking setup.
 
 * Compatible hardware version is `MDriver v1.0` ([hardware repository](https://github.com/dvarx/mdriver_hw))
-* Compatibale firmware version is `10772f` ([firmware repo](https://github.com/dvarx/mdriver_fw))
+* Compatibale firmware version is ij repository: ([firmware repo](https://github.com/dvarx/mdriver_emtracking_fw.git))
 
-![MDriver hardware v1.0](img/mdriver_hw.jpg)
+![MDriver hardware v1.0](img/emtracking_driver_hw.jpg)
 
 ## Services
 
@@ -48,8 +48,8 @@ This folder contains the `MDriver` ROS2 package that is used to control the TNBe
 To test the `mdriver` hardware, the following ROS2 terminal commands can be used
 
     ros2 run mdriver mdriver_node
-    ros2 service call /mdriver/enable mdriver/srv/StateTransition "{enable: [true, true, true, true, true, true]}"
-    ros2 service call /mdriver/run_regular mdriver/srv/StateTransition "{enable: [true, true, true, false, false, false]}"
+    ros2 service call /mdriver/enable mdriver/srv/StateTransition "{enable: [true, true, true]}"
+    ros2 service call /mdriver/run_regular mdriver/srv/StateTransition "{enable: [true, true, true]}"
 
     ros2 topic pub /mdriver/des_currents_reg std_msgs/msg/Float32MultiArray "{layout: {}, data: [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]}" -1
 
