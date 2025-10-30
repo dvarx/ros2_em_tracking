@@ -3,7 +3,7 @@
 This repository contains the code for the `em_tracking` project. Related repositories:
 
 - [Repo for three axis stage](https://github.com/ethz-msrl/stages_utils)
-- [MDriver ROS2 Repo](git@github.com:ethz-msrl/mdriver_ros2.git)
+- [MDriver ROS2 Repo (feature/emtracking)](https://github.com/ethz-msrl/mdriver_ros2/tree/feature/emtracking)
 
 ## Setup Overview
 ### Turn on procedure:
