@@ -14,7 +14,7 @@ This repository contains the code for the `em_tracking` project. Related reposit
 
 **Emergency Turn-Off** : In case of unexpected system behaviour or excessive power/current draw (as indicated by the Multimeter current measurement), the power to the 96V supply can be cut by pushing the red button.
 
-**Shock Hazard** : 
+<span style="color:red">**Shock Hazard**</span>
 - The 96V supply and the On/Off button are connected to the 230V mains supply. Ensure that the connection to the 230V line is disconnected and wait for at least 5min before making any adjustments to the button or 96V supply.
 - **Always turn off the 96V supply and disconnect the 230V mains connection when performing any work or adjustments on the system.**
 
